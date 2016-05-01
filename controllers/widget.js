@@ -1,6 +1,8 @@
 $._resizeThreshold = 0;
 $._oldFirstVisibleItemIndex = -1;
 
+var moment = require('alloy/moment');
+
 var _TAG = "ts.chat2",
     _ERRORS = {
         MISSING_FUNCTION_VALIDATE: "A function to determine the sender of messages is required",
@@ -150,14 +152,16 @@ function _send(clickEvent) {
  * @returns {String} A date to display (either a date or a time)
  */
 function getDisplayableDate(date) {
-    var today = new Date();
-    if (typeof date === 'string') {
-        date = new Date(date);
+    var m = moment(date);
+    if (!m.isValid()) return "[Date error!]";
+
+    // Todo: add localisation
+    if( m.isBefore(moment().subtract({'hours': 36, 'minutes': 0})) ) {
+      return m.calendar();
     }
-    if (today.getYear() == date.getYear() && today.getMonth() == date.getMonth() && today.getDate() == date.getDate()) {
-        return date.getHours() + ':' + date.getMinutes();
-    } else
-        return date.toLocaleDateString(Titanium.Locale.currentLocale);
+    else {
+      return m.fromNow();
+    }
 }
 
 /**
